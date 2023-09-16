@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  app:
+    image: my-nestjs-app
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mongo
+    volumes:
+      - ./data/db:/data/db
+
+  redis:
+    image: redis
