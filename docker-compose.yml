@@ -1,19 +1,39 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  app:
-    image: my-nestjs-app
-    build: .
-    ports:
-      - 3000:3000
-    depends_on:
-      - db
-      - redis
-
-  db:
-    image: mongo
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    env_file:
+      - .env
     volumes:
-      - ./data/db:/data/db
+      - mongodata:/data/db
+    networks:
+      - db_network
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gameserver
+    ports:
+      - 2001:2001
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - db_network
 
   redis:
-    image: redis
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+
+volumes:
+  mongodata:
+
+networks:
+  db_network:
