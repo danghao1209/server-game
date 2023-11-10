@@ -1,19 +1,29 @@
 import { IsNotEmpty } from 'class-validator';
 
+export class PostCreateUserDto {
+  @IsNotEmpty() username: string;
+  @IsNotEmpty() password: string;
+  @IsNotEmpty() rePassword: string;
+  refreshToken: string;
+}
+
 export class CreateUserDto {
-  @IsNotEmpty() email: string;
-  @IsNotEmpty() name: string;
+  @IsNotEmpty() username: string;
   @IsNotEmpty() password: string;
   refreshToken: string;
 }
 
 export class UpdateUserDto {
-  @IsNotEmpty() email: string;
-  @IsNotEmpty() name: string;
+  @IsNotEmpty() username: string;
   @IsNotEmpty() password: string;
+  @IsNotEmpty() repassword: string;
 }
 
 export class LoginUserDto {
-  @IsNotEmpty() email: string;
+  @IsNotEmpty() username: string;
   @IsNotEmpty() password: string;
+}
+
+export class PostAddCoinsDto {
+  @IsNotEmpty() coin: number;
 }

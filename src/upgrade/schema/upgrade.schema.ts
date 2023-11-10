@@ -5,12 +5,18 @@ export type UpgradeDocument = Upgrade & Document;
 enum Genre {
   Atk = 'ATK',
   Hp = 'HP',
-  Shield = 'Shield',
+  Armor = 'ARMOR',
   EXP = 'EXP',
-  Speed = 'SPEED',
+  SpeedRun = 'SPEEDRUN',
+  SpeedATK = 'SPEEDATK',
+  Cooldown = 'COOLDOWN',
+  Pet = 'PET',
+  Crit = 'CRIT',
+  CritDame = 'CRITDAME',
+  HealthUpLevel = 'HEALTHUPLEVEL',
 }
 
-interface Buff {
+export interface Buff {
   name: Genre;
   properties: {
     number: number;
@@ -22,17 +28,23 @@ interface Buff {
   timestamps: true,
 })
 export class Upgrade {
-  @Prop({ required: true, unique: true, lowercase: true })
-  name: string;
-
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  buff: Buff;
+  @Prop({ required: true, unique: true })
+  upgradeLevel: number;
 
-  @Prop({ required: true })
-  upgradeFloor: number;
+  @Prop({ required: true, type: String })
+  type: Genre;
+
+  @Prop({ required: true, type: Number })
+  numberOrPercent: number;
+
+  @Prop({ required: true, type: Boolean })
+  isPercent: boolean;
+
+  @Prop({ required: true, type: Number })
+  coinCost: number;
 }
 
-export const UserSchema = SchemaFactory.createForClass(Upgrade);
+export const UpgradeSchema = SchemaFactory.createForClass(Upgrade);

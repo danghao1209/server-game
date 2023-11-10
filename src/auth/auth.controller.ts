@@ -1,50 +1,57 @@
 import {
+  BadRequestException,
   Body,
   Controller,
-  HttpCode,
+  Get,
   HttpStatus,
+  Inject,
   Post,
-  UseGuards,
+  Req,
+  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
-
-import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
-import { RtGuard } from '../common/guards';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
-import { Tokens } from './types';
+import { LoginUserDto, PostCreateUserDto } from '../user/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(@Inject(AuthService) private authService: AuthService) {}
 
-  @Public()
-  @Post('local/signup')
-  @HttpCode(HttpStatus.CREATED)
-  signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signupLocal(dto);
+  @Post('signup')
+  async signup(@Body() createUserDto: PostCreateUserDto, @Res() res: Response) {
+    try {
+      const tokens = await this.authService.signUp(createUserDto);
+      return res.status(HttpStatus.OK).json(tokens);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: error.message,
+        });
+      } else {
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'Something went wrong',
+        });
+      }
+    }
   }
 
-  @Public()
-  @Post('local/signin')
-  @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signinLocal(dto);
-  }
-
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentUserId() userId: number): Promise<boolean> {
-    return this.authService.logout(userId);
-  }
-
-  @Public()
-  @UseGuards(RtGuard)
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  refreshTokens(
-    @GetCurrentUserId() userId: number,
-    @GetCurrentUser('refreshToken') refreshToken: string,
-  ): Promise<Tokens> {
-    return this.authService.refreshTokens(userId, refreshToken);
+  @Post('signin')
+  async signin(@Body() data: LoginUserDto, @Res() res: Response) {
+    try {
+      console.log('hi');
+      const tokens = await this.authService.signIn(data);
+      return res.status(HttpStatus.OK).json(tokens);
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: error.message,
+        });
+      } else {
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'Something went wrong',
+        });
+      }
+    }
   }
 }
