@@ -32,4 +32,16 @@ export class PetService {
       throw new BadRequestException('Error creating upgrade');
     }
   }
+
+  async getById(id: mongoose.Types.ObjectId): Promise<PetDocument> {
+    try {
+      return await this.petModel.findOne(
+        { _id: id },
+        '-createdAt -updatedAt -__v',
+      );
+    } catch (error) {
+      console.log(error.message);
+      throw new BadRequestException('Error creating upgrade');
+    }
+  }
 }

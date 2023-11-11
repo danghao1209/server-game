@@ -71,7 +71,7 @@ export class AdminController {
     }
   }
 
-  @Get()
+  @Get('users')
   getTestData() {
     return 'hhi';
   }

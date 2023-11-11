@@ -24,10 +24,23 @@ import { PostAddCoinsDto } from './dto/user.dto';
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
-  @UseGuards(AccessTokenGuard)
   @Get('/all')
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(@Request() req, @Res() res: Response) {
+    try {
+      const data = await this.usersService.findAll();
+      console.log(data);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: error.message,
+        });
+      } else {
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'Something went wrong',
+        });
+      }
+    }
   }
 
   @UseGuards(AccessTokenGuard)
@@ -60,7 +73,6 @@ export class UserController {
         });
       }
     }
-    return;
   }
 
   @UseGuards(AccessTokenGuard)
